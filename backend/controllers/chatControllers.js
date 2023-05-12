@@ -3,7 +3,7 @@ const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 
 const accessChat = asyncHandler(async (req, res) => {
-  const { UserId } = req.body;
+  const { userId } = req.body;
 
   if (!userId) {
     console.log("User ID not send with request");
@@ -60,7 +60,7 @@ const fetchChats = asyncHandler(async (req, res) => {
           path: "latestMessage.sender",
           select: "name pic email",
         });
-        res.status(200), send(results);
+        res.status(200).send(results);
       });
   } catch (error) {
     res.status(400);
