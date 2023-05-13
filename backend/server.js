@@ -1,23 +1,21 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const dotenv = require("dotenv");
-dotenv.config();
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const path = require("path");
-const PORT = process.env.PORT;
 
-const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
-
+dotenv.config();
 connectDB();
-
 const app = express();
-app.use(express.json());
+
+app.use(express.json()); 
 
 app.get("/", (req, res) => {
-  res.send("API is running..");
-});
+  res.send("API Running...");
+})
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
@@ -26,9 +24,11 @@ app.use("/api/message", messageRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+const PORT = process.env.PORT;
+
 const server = app.listen(
   PORT,
-  console.log(`Server running on PORT ${PORT}...`)
+  console.log(`Server running on PORT ${PORT}...`.yellow.bold)
 );
 
 const io = require("socket.io")(server, {
@@ -40,7 +40,6 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
-
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
@@ -61,12 +60,12 @@ io.on("connection", (socket) => {
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
 
-      socket.in(user._id).emit("Message recieved", newMessageRecieved);
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
   });
 
   socket.off("setup", () => {
-    console.log("User Disconnected");
+    console.log("USER DISCONNECTED");
     socket.leave(userData._id);
   });
 });

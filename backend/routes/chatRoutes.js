@@ -1,20 +1,21 @@
 const express = require("express");
-const { protect } = require("../middlewares/authMiddleware");
 const {
   accessChat,
   fetchChats,
   createGroupChat,
-  renameGroup,
+  removeFromGroup,
   addToGroup,
-  removeFromGroup
+  renameGroup,
 } = require("../controllers/chatControllers");
-const chatRoutes = express.Router();
+const { protect } = require("../middleware/authMiddleware");
 
-chatRoutes.route("/").post(protect, accessChat);
-chatRoutes.route("/").get(protect, fetchChats);
-chatRoutes.route("/group").post(protect, createGroupChat);
-chatRoutes.route("/rename").put(protect, renameGroup);
-chatRoutes.route("/groupadd").put(protect, addToGroup);
-chatRoutes.route("/groupremove").put(protect, removeFromGroup);
+const router = express.Router();
 
-module.exports = chatRoutes;
+router.route("/").post(protect, accessChat);
+router.route("/").get(protect, fetchChats);
+router.route("/group").post(protect, createGroupChat);
+router.route("/rename").put(protect, renameGroup);
+router.route("/groupremove").put(protect, removeFromGroup);
+router.route("/groupadd").put(protect, addToGroup);
+
+module.exports = router;

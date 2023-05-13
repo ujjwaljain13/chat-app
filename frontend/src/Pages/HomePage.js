@@ -1,25 +1,31 @@
-import React, { useEffect } from "react";
-import { Container, Box, Text } from "@chakra-ui/react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+} from "@chakra-ui/react";
+import { useEffect } from "react";
+import { useHistory } from "react-router";
 import Login from "../components/Authentication/Login";
-import Signup from "../components/Authentication/Signup.js";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import Signup from "../components/Authentication/Signup";
+
 function Homepage() {
   const history = useHistory();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
 
-    if (user) {
-      history.push("/chats");
-      window.location.reload();
-    }
+    if (user) history.push("/chats");
   }, [history]);
 
   return (
     <Container maxW="xl" centerContent>
       <Box
-        d="flex"
+        display="flex"
         justifyContent="center"
         p={3}
         bg="white"
@@ -28,7 +34,7 @@ function Homepage() {
         borderRadius="lg"
         borderWidth="1px"
       >
-        <Text fontSize="4xl" fontFamily="Work sans" textAlign='center'>
+        <Text fontSize="4xl" fontFamily="Work sans">
           Chat App
         </Text>
       </Box>

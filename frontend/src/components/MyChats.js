@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { ChatState } from "../Context/ChatProvider";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
-import axios from "axios";
 import { AddIcon } from "@chakra-ui/icons";
-import ChatLoading from './ChatLoading'
+import { Box, Stack, Text } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/toast";
+import { ChatState } from "../Context/ChatProvider";
+import { Button } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { getSender } from "../config/ChatLogics";
-const MyChats = () => {
+import ChatLoading from "./ChatLoading";
+import GroupChatModal from "./miscellaneous/GroupChatModal";
+import axios from "axios";
+
+const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
+
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -19,7 +25,6 @@ const MyChats = () => {
       };
 
       const { data } = await axios.get("/api/chat", config);
-      console.log(data);
       setChats(data);
     } catch (error) {
       toast({
@@ -37,7 +42,7 @@ const MyChats = () => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box
@@ -54,60 +59,66 @@ const MyChats = () => {
         pb={3}
         px={3}
         fontSize={{ base: "28px", md: "30px" }}
-        fontFamily="Work Sans"
+        fontFamily="Work sans"
         display="flex"
         w="100%"
         justifyContent="space-between"
         alignItems="center"
       >
         My Chats
-        <Button
-          display="flex"
-          fontSize={{ base: "16px", md: "12px", lg: "16px" }}
-          rightIcon={<AddIcon />}
-        >
-          New Group Chat
-        </Button>
+        <GroupChatModal>
+          <Button
+            display="flex"
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModal>
       </Box>
-
       <Box
-      display='flex'
-      flexDir='column'
-      p={3}
-      bg='#F8F8F8'
-      w='100%'
-      h='100%'
-      borderRadius='lg'
-      overflowY='hidden'
+        display="flex"
+        flexDir="column"
+        p={3}
+        bg="#F8F8F8"
+        w="100%"
+        h="100%"
+        borderRadius="lg"
+        overflowY="hidden"
       >
-        {chats ?(
-          <Stack overflowY='scroll'>
+        {chats ? (
+          <Stack overflowY="scroll">
             {chats.map((chat) => (
-              <Box onClick={()=>setSelectedChat(chat)}
-              cursor='pointer'
-              bg={selectedChat === chat?'#38B2AC':'#E8E8E8'}
-              color={selectedChat===chat?'white':'black'}
-              px={3}
-              py={2}
-              borderRadius='lg'
-              key={chat._id}
+              <Box
+                onClick={() => setSelectedChat(chat)}
+                cursor="pointer"
+                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
+                color={selectedChat === chat ? "white" : "black"}
+                px={3}
+                py={2}
+                borderRadius="lg"
+                key={chat._id}
               >
                 <Text>
-                  {!chat.isGroupChat ?getSender(loggedUser,chat.users):(chat.chatName)}
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
                 </Text>
-
+                {chat.latestMessage && (
+                  <Text fontSize="xs">
+                    <b>{chat.latestMessage.sender.name} : </b>
+                    {chat.latestMessage.content.length > 50
+                      ? chat.latestMessage.content.substring(0, 51) + "..."
+                      : chat.latestMessage.content}
+                  </Text>
+                )}
               </Box>
             ))}
-
           </Stack>
-
-        ):(
-          <ChatLoading/>
-        )
-         
-        }
+        ) : (
+          <ChatLoading />
+        )}
       </Box>
-
     </Box>
   );
 };
